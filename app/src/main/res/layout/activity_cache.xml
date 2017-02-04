@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_cache"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:background="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_marginBottom="8dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/activity_cache_back"
+            android:onClick="click"
+            android:layout_marginLeft="8dp"
+            android:background="@drawable/settings_back"
+            android:layout_width="25dp"
+            android:layout_height="25dp"/>
+
+        <TextView
+            android:layout_marginBottom="8dp"
+            android:textSize="20dp"
+            android:layout_centerInParent="true"
+            android:text="离线缓存"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:background="#99ffffff"
+        android:id="@+id/activity_cache_listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
