@@ -212,13 +212,13 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     private Socket socket;
     //发送socket(连接-断开-连接-断开)
     public void sendSocket(final char msg){
-        new Thread(new Runnable() {
+        cachedThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     socket = new Socket("192.168.11.123", 2005);
                     boolean connected = socket.isConnected();
-                    Log.d("splash","下键connected = "+connected);
+                    Log.d("splash","connected = "+connected);
                     Log.d("splash","创建连接");
                     if(socket==null){
                         mHandler.sendEmptyMessage(CONNECT_ERROR);
@@ -226,9 +226,9 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                     }
                     DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
                     writer.write(Character.toString(msg).getBytes());
+                    writer.flush();
                     Log.d("splash","发送连接");
                     socket.shutdownOutput();
-                    socket.shutdownInput();
                     socket.close();
                     socket = null;
                     Log.d("splash","断开连接");
@@ -236,7 +236,7 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
     //发送socket2(长连接)

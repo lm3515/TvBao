@@ -111,7 +111,7 @@ public class CacheActivity extends AppCompatActivity {
                         CacheVideoInfo cacheVideoInfo = videoInfos.get(position);
                         File dir = new File(SAVE_REAL_PATH);
                         File deleteFile = new File(dir,cacheVideoInfo.videoName+".mp4");
-                        deleteFile.delete();           //
+                        deleteFile.delete();           //删除文件
                         videoInfos.remove(position);   //删除集合中的数据
 
                         adapter.notifyDataSetChanged();

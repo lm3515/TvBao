@@ -17,6 +17,7 @@ import okhttp3.Call;
 public class BaseActivity extends AppCompatActivity {
 
     protected ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();
+    protected ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
     protected void OkHttpUtils_get(String url, final int type){
         OkHttpUtils
                 .get()
