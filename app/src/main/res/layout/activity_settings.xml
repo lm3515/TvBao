@@ -25,7 +25,7 @@
             android:layout_marginBottom="8dp"
             android:textSize="20dp"
             android:layout_centerInParent="true"
-            android:text="设置"
+            android:text="@string/settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -52,7 +52,7 @@
             android:layout_marginBottom="40dp"
             android:layout_weight="1"
             android:id="@+id/activity_settings_changeWiFiName"
-            android:text="更改WiFi名称"
+            android:text="@string/change_wifi_name"
             android:background="@drawable/settings_bt_bg_selector"
             android:layout_width="150dp"
             android:layout_height="0dp"/>
@@ -63,7 +63,7 @@
             android:layout_marginBottom="40dp"
             android:layout_weight="1"
             android:id="@+id/activity_settings_changeWiFiPsw"
-            android:text="更改WiFi密码"
+            android:text="@string/change_wifi_psw"
             android:background="@drawable/settings_bt_bg_selector"
             android:layout_width="150dp"
             android:layout_height="0dp"/>
@@ -74,7 +74,7 @@
             android:layout_marginBottom="100dp"
             android:layout_weight="1"
             android:id="@+id/activity_settings_reset"
-            android:text="恢复出厂设置"
+            android:text="@string/change_reset"
             android:background="@drawable/settings_bt_bg_selector"
             android:layout_width="150dp"
             android:layout_height="0dp"/>

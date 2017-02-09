@@ -88,7 +88,7 @@ public class CacheActivity extends AppCompatActivity {
                 deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
                         0x3F, 0x25)));
                 deleteItem.setWidth(300);
-                deleteItem.setTitle("删除");
+                deleteItem.setTitle(R.string.delete);
                 deleteItem.setTitleSize(18);
                 deleteItem.setTitleColor(Color.WHITE);
                 menu.addMenuItem(deleteItem);

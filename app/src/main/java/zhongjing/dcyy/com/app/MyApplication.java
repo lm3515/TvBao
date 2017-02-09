@@ -6,7 +6,6 @@ import android.content.Context;
 import com.tencent.bugly.Bugly;
 import com.zhy.http.okhttp.OkHttpUtils;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +37,7 @@ public class MyApplication extends Application {
         //Bugly
         Bugly.init(getApplicationContext(), "523a62318c", false);
 
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -47,11 +46,12 @@ public class MyApplication extends Application {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }).start();*/
 
     }
 
     public static Context getAppContext() {
         return sInstance;
     }
+
 }

@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">ZJBOX</string>
+
+    <!--SettingsActivity-->
+    <string name="wifi_name">The name cannot be empty</string>
+    <string name="wifi_psw">Password cannot be empty</string>
+
+    <string name="set_error">Setup failed, please try again</string>
+
+    <string name="set_name_success">Set the name is successful, take effect after reboot</string>
+    <string name="set_name_fail">Set the name of failure, please try again</string>
+
+    <string name="set_psw_success">A password is successful, take effect after reboot</string>
+    <string name="set_psw_fail">Failed to set the password, please try again</string>
+
+    <string name="reset_success">To restore factory Settings</string>
+    <string name="reset_fail">Failed to restore the factory Settings, please try again</string>
+
+    <!--PlayActivity-->
+    <string name="line_error">Unable to connect, please check the network</string>
+
+    <!--activity_setting-->
+    <string name="settings">Settings</string>
+    <string name="change_wifi_name">Change the name of the WiFi</string>
+    <string name="change_wifi_psw">Change the WiFi password</string>
+    <string name="change_reset">Restore the factory Settings</string>
+
+    <!--activity_splash-->
+    <string name="play">play</string>
+    <string name="set_wifi">WiFi Settings</string>
+
+    <!--activity_cache-->
+    <string name="offline_caching">Offline caching</string>
+    <string name="delete">Delete</string>
+
+    <!--activity_cache_video_land-->
+    <string name="play_duration">Playing time</string>
+    <string name="total_duration">The total time</string>
+
+    <!--item_cache_activity-->
+    <string name="video_name">The name of the video</string>
+    <string name="video_size">Video size</string>
+
+    <!--name_dialog-->
+    <string name="cancel">cancel</string>
+    <string name="sure">ensure</string>
+
+    <!--psw_dialog-->
+    <string name="hint">Password length of not less than 8 characters</string>
+
+    <!--reset_dialog-->
+    <string name="confirm_reset">Are you sure you want to restore the factory Settings?</string>
+
+
+</resources>

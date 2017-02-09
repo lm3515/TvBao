@@ -32,6 +32,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.Socket;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
@@ -45,6 +46,7 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
 
     private static final int HIDE_VOLUME = 100;
     private static final int HIDE_BRIGHT = 200;
+    private static final int CONNECT_ERROR = 300;
     private static final String URL_RTSP = "rtsp://192.168.11.123/1/h264major";
 
     private RelativeLayout topLayout;
@@ -86,6 +88,10 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                     break;
                 case HIDE_BRIGHT:
                     bright_ll.setVisibility(View.GONE);
+                    break;
+                case CONNECT_ERROR:
+                    Toast.makeText(PlayActivity.this,R.string.line_error,Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
     };
@@ -203,12 +209,46 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
 
     }
 
-    //发送socket
+    private Socket socket;
+    //发送socket(连接-断开-连接-断开)
     public void sendSocket(final char msg){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket("192.168.11.123", 2005);
+                    boolean connected = socket.isConnected();
+                    Log.d("splash","下键connected = "+connected);
+                    Log.d("splash","创建连接");
+                    if(socket==null){
+                        mHandler.sendEmptyMessage(CONNECT_ERROR);
+                        return;
+                    }
+                    DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
+                    writer.write(Character.toString(msg).getBytes());
+                    Log.d("splash","发送连接");
+                    socket.shutdownOutput();
+                    socket.shutdownInput();
+                    socket.close();
+                    socket = null;
+                    Log.d("splash","断开连接");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    //发送socket2(长连接)
+    public void sendSocket2(final char msg){
         singleThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    if(MyApplication.socket==null){
+                        mHandler.sendEmptyMessage(CONNECT_ERROR);
+                        return;
+                    }
                     DataOutputStream writer = new DataOutputStream(MyApplication.socket.getOutputStream());
                     writer.write(Character.toString(msg).getBytes());
                 } catch (IOException e) {
@@ -254,7 +294,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                 }
                 isRecoding = !isRecoding;
                 break;
-
             case R.id.activity_play_btn_ok:                    //ok键
                 sendSocket('g');  //103
                 break;
@@ -274,7 +313,7 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                 sendSocket('d'); //100
                 break;
             case R.id.activity_play_btn_closemenu:             //关闭菜单键
-                sendSocket('j');//106
+                sendSocket('j'); //106
                 break;
 
         }
@@ -345,7 +384,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                 }
                 float offsetY = startY - event.getY();
                 float offsetPercent = offsetY / windowH;
-                Log.d("splash","offsetPercent = "+offsetPercent);
                 if(offsetPercent==0.0){
                     break;
                 }

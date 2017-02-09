@@ -1,3 +1,55 @@
 <resources>
     <string name="app_name">ZJBOX</string>
+
+    <!--SettingsActivity-->
+    <string name="wifi_name">名称不能为空</string>
+    <string name="wifi_psw">密码不能为空</string>
+
+    <string name="set_error">设置失败,请重试</string>
+
+    <string name="set_name_success">设置名称成功,重启设备后生效</string>
+    <string name="set_name_fail">设置名称失败,请重试</string>
+
+    <string name="set_psw_success">设置密码成功,重启设备后生效</string>
+    <string name="set_psw_fail">设置密码失败,请重试</string>
+
+    <string name="reset_success">恢复出厂设置成功</string>
+    <string name="reset_fail">恢复出厂设置失败,请重试</string>
+
+    <!--PlayActivity-->
+    <string name="line_error">无法连接,请检查网络</string>
+
+    <!--activity_setting-->
+    <string name="settings">设置</string>
+    <string name="change_wifi_name">更改WiFi名称</string>
+    <string name="change_wifi_psw">更改WiFi密码</string>
+    <string name="change_reset">恢复出厂设置</string>
+
+    <!--activity_splash-->
+    <string name="play">播放</string>
+    <string name="set_wifi">WiFi设置</string>
+
+    <!--activity_cache-->
+    <string name="offline_caching">离线缓存</string>
+    <string name="delete">删除</string>
+
+    <!--activity_cache_video_land-->
+    <string name="play_duration">播放时间</string>
+    <string name="total_duration">总时间</string>
+
+    <!--item_cache_activity-->
+    <string name="video_name">视频名称</string>
+    <string name="video_size">视频大小</string>
+
+    <!--name_dialog-->
+    <string name="cancel">取消</string>
+    <string name="sure">确定</string>
+
+    <!--psw_dialog-->
+    <string name="hint">密码长度不少于8个字符</string>
+
+    <!--reset_dialog-->
+    <string name="confirm_reset">您确定要恢复出厂设置?</string>
+
+
 </resources>

@@ -53,7 +53,7 @@ public class SettingsActivity extends BaseActivity {
                     public void onClick(View v) {
                         String wifiName = name_et.getText().toString();
                         if(TextUtils.isEmpty(wifiName)){
-                            Toast.makeText(SettingsActivity.this,"名称不能为空",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this,R.string.wifi_name,Toast.LENGTH_SHORT).show();
                             dialogName.dismiss();
                         }else{
                             OkHttpUtils_get("http://192.168.11.123/api/setssid?ssid="+wifiName,REQUEST_NAME);
@@ -87,7 +87,7 @@ public class SettingsActivity extends BaseActivity {
                     public void onClick(View v) {
                         String wifiPsw = psw_et.getText().toString();
                         if(TextUtils.isEmpty(wifiPsw)){
-                            Toast.makeText(SettingsActivity.this,"密码不能为空",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this,R.string.wifi_psw,Toast.LENGTH_SHORT).show();
                             dialogPsw.dismiss();
                         }else{
                             OkHttpUtils_get("http://192.168.11.123/api/setpasswd?pswd="+wifiPsw,REQUEST_PSW);
@@ -135,7 +135,7 @@ public class SettingsActivity extends BaseActivity {
             case REQUEST_NAME:
             case REQUEST_PSW:
             case REQUEST_RESET:
-                Toast.makeText(SettingsActivity.this,"设置失败,请重试",Toast.LENGTH_SHORT).show();
+                Toast.makeText(SettingsActivity.this,R.string.set_error,Toast.LENGTH_SHORT).show();
                 break;
 
         }
@@ -147,23 +147,23 @@ public class SettingsActivity extends BaseActivity {
             switch (type){
                 case REQUEST_NAME:
                     if(code.equals("0")){
-                        Toast.makeText(SettingsActivity.this,"设置名称成功,重启设备后生效",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingsActivity.this,R.string.set_name_success,Toast.LENGTH_SHORT).show();
                     }else{
-                        Toast.makeText(SettingsActivity.this,"设置名称失败,请重试",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingsActivity.this,R.string.set_name_fail,Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case REQUEST_PSW:
                     if(code.equals("0")){
-                        Toast.makeText(SettingsActivity.this,"设置密码成功,重启设备后生效",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingsActivity.this,R.string.set_psw_success,Toast.LENGTH_SHORT).show();
                     }else{
-                        Toast.makeText(SettingsActivity.this,"设置密码失败,请重试",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingsActivity.this,R.string.set_psw_fail,Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case REQUEST_RESET:
                     if(code.equals("0")){
-                        Toast.makeText(SettingsActivity.this,"恢复出厂设置成功",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingsActivity.this,R.string.reset_success,Toast.LENGTH_SHORT).show();
                     }else{
-                        Toast.makeText(SettingsActivity.this,"恢复出厂设置失败,请重试",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingsActivity.this,R.string.reset_fail,Toast.LENGTH_SHORT).show();
                     }
                     break;
             }

@@ -9,7 +9,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center_horizontal"
-        android:text="更改WiFi名称"
+        android:text="@string/change_wifi_name"
         android:textSize="20dp"
         android:textColor="#000000"
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
         <Button
             android:id="@+id/name_dialog_cancel"
             android:background="@drawable/dialog_cancel_bt_bg_selector"
-            android:text="取消"
+            android:text="@string/cancel"
             android:textColor="#0000ff"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -39,7 +39,7 @@
         <Button
             android:id="@+id/name_dialog_sure"
             android:background="@drawable/dialog_sure_bt_bg_selector"
-            android:text="确定"
+            android:text="@string/sure"
             android:textColor="#0000ff"
             android:layout_width="0dp"
             android:layout_weight="1"
