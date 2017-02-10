@@ -14,7 +14,6 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -217,9 +216,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
             public void run() {
                 try {
                     socket = new Socket("192.168.11.123", 2005);
-                    boolean connected = socket.isConnected();
-                    Log.d("splash","connected = "+connected);
-                    Log.d("splash","创建连接");
                     if(socket==null){
                         mHandler.sendEmptyMessage(CONNECT_ERROR);
                         return;
@@ -227,11 +223,9 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                     DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
                     writer.write(Character.toString(msg).getBytes());
                     writer.flush();
-                    Log.d("splash","发送连接");
                     socket.shutdownOutput();
                     socket.close();
                     socket = null;
-                    Log.d("splash","断开连接");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -295,25 +289,25 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                 isRecoding = !isRecoding;
                 break;
             case R.id.activity_play_btn_ok:                    //ok键
-                sendSocket('g');  //103
+                sendSocket2('g');  //103
                 break;
             case R.id.activity_play_btn_up:                    //上键
-                sendSocket('e'); //101
+                sendSocket2('e'); //101
                 break;
             case R.id.activity_play_btn_down:                   //下键
-                sendSocket('f');  //102
+                sendSocket2('f');  //102
                 break;
             case R.id.activity_play_btn_left:                   //左键
-                sendSocket('h'); //104
+                sendSocket2('h'); //104
                 break;
             case R.id.activity_play_btn_right:                  //右键
-                sendSocket('i'); //105
+                sendSocket2('i'); //105
                 break;
             case R.id.activity_play_btn_menu:                  //菜单键
-                sendSocket('d'); //100
+                sendSocket2('d'); //100
                 break;
             case R.id.activity_play_btn_closemenu:             //关闭菜单键
-                sendSocket('j'); //106
+                sendSocket2('j'); //106
                 break;
 
         }
