@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-    <!--<com.dou361.ijkplayer.widget.TextureRenderView
-        android:id="@+id/activity_play_sv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>-->
-
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <zhongjing.dcyy.com.widget.widget.media.TextureRenderView
+        android:background="#ffffff"
         android:id="@+id/activity_play_sv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        app:indicatorName="LineScalePartyIndicator"
+        app:indicatorColor="#ffffff"
+        />
 
     <Chronometer
         android:visibility="gone"
@@ -46,9 +52,10 @@
         android:id="@+id/activity_play_land_btn_unlock"
         android:src="@drawable/land_btn_unlock"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_marginLeft="3dp"
+        android:padding="5dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"/>
 
     <RelativeLayout
         android:id="@+id/activity_play_land_rl_top"
@@ -61,8 +68,8 @@
             android:id="@+id/activity_play_land_btn_back"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:layout_width="45dp"
-            android:layout_height="45dp"/>
+            android:layout_width="35dp"
+            android:layout_height="35dp"/>
 
         <Button
             android:onClick="click"
@@ -71,13 +78,14 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
-            android:layout_width="45dp"
-            android:layout_height="45dp"/>
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
     </RelativeLayout>
 
     <!--android:paddingTop="8dp"-->
     <!--android:paddingBottom="8dp"-->
     <RelativeLayout
+        android:animateLayoutChanges="true"
         android:id="@+id/activity_play_land_rl_bottom"
         android:layout_alignParentBottom="true"
         android:gravity="center"
@@ -85,38 +93,46 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:src="@drawable/land_bottom_bg"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:background="@drawable/land_bottom_bg"
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content">
+            android:padding="10dp"
+            android:layout_width="280dp"
+            android:layout_height="35dp">
 
         <ImageView
+            android:padding="15dp"
+            android:layout_marginLeft="10dp"
             android:src="@drawable/land_btn_camera_selector"
             android:onClick="click"
-            android:layout_marginRight="60dp"
+            android:layout_marginRight="20dp"
             android:id="@+id/activity_play_btn_camera"
             android:layout_width="@dimen/land_width_function"
             android:layout_height="@dimen/land_height_function"/>
 
         <ImageView
+            android:padding="15dp"
             android:src="@drawable/land_btn_vcr_selector"
             android:onClick="click"
-            android:layout_marginRight="60dp"
+            android:layout_marginRight="20dp"
             android:id="@+id/activity_play_btn_vcr"
             android:layout_width="@dimen/land_width_function"
             android:layout_height="@dimen/land_height_function"/>
 
         <ImageView
+            android:padding="15dp"
             android:src="@drawable/land_btn_menu_selector"
             android:onClick="click"
-            android:layout_marginRight="60dp"
+            android:layout_marginRight="20dp"
             android:id="@+id/activity_play_btn_menu"
             android:layout_width="@dimen/land_width_function"
             android:layout_height="@dimen/land_height_function"/>
 
 
         <ImageView
+            android:padding="15dp"
             android:src="@drawable/land_btn_closemenu_selector"
             android:onClick="click"
             android:id="@+id/activity_play_btn_closemenu"
@@ -127,23 +143,32 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:padding="12dp"
+        android:clickable="true"
         android:background="@drawable/btn_black_trans"
         android:id="@+id/activity_play_land_rl_right"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginRight="20dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginRight="18dp"
         android:layout_above="@+id/activity_play_land_rl_bottom"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="18dp">
+
+        <ImageView
+            android:scaleType="centerInside"
+            android:background="@drawable/vertical_btn_ok_bg"
+            android:layout_centerInParent="true"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
 
         <ImageView
             android:src="@drawable/land_btn_ok_selector"
             android:onClick="click"
             android:id="@+id/activity_play_btn_ok"
             android:layout_centerInParent="true"
-            android:layout_width="@dimen/land_width_menu"
-            android:layout_height="10dp"/>
+            android:padding="5dp"
+            android:layout_width="35dp"
+            android:layout_height="30dp"/>
 
         <ImageView
             android:src="@drawable/land_btn_up_selector"
@@ -151,6 +176,7 @@
             android:id="@+id/activity_play_btn_up"
             android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
+            android:padding="5dp"
             android:layout_width="@dimen/land_width_menu"
             android:layout_height="@dimen/land_height_menu"/>
 
@@ -160,6 +186,7 @@
             android:id="@+id/activity_play_btn_down"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
+            android:padding="5dp"
             android:layout_width="@dimen/land_width_menu"
             android:layout_height="@dimen/land_height_menu"/>
 
@@ -168,6 +195,7 @@
             android:onClick="click"
             android:id="@+id/activity_play_btn_left"
             android:layout_centerVertical="true"
+            android:padding="5dp"
             android:layout_width="@dimen/land_width_menu"
             android:layout_height="@dimen/land_height_menu"/>
 
@@ -177,6 +205,7 @@
             android:id="@+id/activity_play_btn_right"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
+            android:padding="5dp"
             android:layout_width="@dimen/land_width_menu"
             android:layout_height="@dimen/land_height_menu"/>
 

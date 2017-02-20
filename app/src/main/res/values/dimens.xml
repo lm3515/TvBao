@@ -6,13 +6,13 @@
     <!--vertical-->
     <dimen name="vertical_width_function">50dp</dimen>
     <dimen name="vertical_height_function">50dp</dimen>
-    <dimen name="vertical_width_menu">20dp</dimen>
-    <dimen name="vertical_height_menu">20dp</dimen>
+    <dimen name="vertical_width_menu">60dp</dimen>
+    <dimen name="vertical_height_menu">60dp</dimen>
 
     <!--land-->
-    <dimen name="land_width_function">30dp</dimen>
-    <dimen name="land_height_function">30dp</dimen>
-    <dimen name="land_width_menu">20dp</dimen>
-    <dimen name="land_height_menu">20dp</dimen>
+    <dimen name="land_width_function">45dp</dimen>
+    <dimen name="land_height_function">45dp</dimen>
+    <dimen name="land_width_menu">35dp</dimen>
+    <dimen name="land_height_menu">35dp</dimen>
 
 </resources>

@@ -12,13 +12,16 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -29,7 +32,6 @@ import android.widget.Toast;
 
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -78,10 +80,10 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     private ProgressBar bright_pb;
     private LinearLayout volume_ll;
     private LinearLayout bright_ll;
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case HIDE_VOLUME:
                     volume_ll.setVisibility(View.GONE);
                     break;
@@ -89,13 +91,16 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                     bright_ll.setVisibility(View.GONE);
                     break;
                 case CONNECT_ERROR:
-                    Toast.makeText(PlayActivity.this,R.string.line_error,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PlayActivity.this, R.string.line_error, Toast.LENGTH_SHORT).show();
                     break;
             }
         }
     };
     private Chronometer timer;
-
+    private int mBottomY;
+    private Animation mShowAnim;
+    private Animation mHideAnim;
+    private View mLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,10 +114,16 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         initVolumeAndBright();
         initListener();
         initEvent();
-
+        initAnimation();
         /*IjkMediaPlayer.loadLibrariesOnce(null);
         IjkMediaPlayer.native_profileBegin("libijkplayer.so");*/
 
+    }
+
+
+    private void initAnimation() {
+        mShowAnim = AnimationUtils.loadAnimation(this, R.anim.show_anim);
+        mHideAnim = AnimationUtils.loadAnimation(this, R.anim.hide_anim);
     }
 
     @Override
@@ -141,6 +152,8 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         bright_ll = (LinearLayout) findViewById(R.id.activity_play_bright);//亮度容器
         bright_pb = (ProgressBar) findViewById(R.id.bright_pb); //亮度pb
 
+        mLoading = findViewById(R.id.loading);
+        mLoading.setVisibility(View.VISIBLE);
     }
 
     //初始化音量和亮度
@@ -150,17 +163,26 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);//flag 1 显示系统调节控件 0 不显示
 
+        volume_pb.setProgress(volume / maxVolume * 100);
+
         window = this.getWindow();
         lp = window.getAttributes();
+        try {
+            saveBright = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+            float currentBright = (float) saveBright / 255 * 100;
+            bright_pb.setProgress((int) currentBright);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     //初始化监听器
     private void initListener() {
-        detector = new GestureDetector(this,new MyGestureListener());
+        detector = new GestureDetector(this, new MyGestureListener());
     }
 
     private void initEvent() {
-        mediaPlayer=new IjkMediaPlayer();
+        mediaPlayer = new IjkMediaPlayer();
 
         surfaceView.addRenderCallback(this);
 
@@ -185,8 +207,8 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         mediaPlayer.setOnCompletionListener(this);
 
         //截图时声音
-        soundPool= new SoundPool(1,AudioManager.STREAM_SYSTEM,5);
-        soundPool.load(this,R.raw.shutter,1);
+        soundPool = new SoundPool(1, AudioManager.STREAM_SYSTEM, 5);
+        soundPool.load(this, R.raw.shutter, 1);
 
     }
 
@@ -201,6 +223,12 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     @Override
     public void onPrepared(IMediaPlayer iMediaPlayer) {
         iMediaPlayer.start();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mLoading.setVisibility(View.GONE);
+            }
+        }, 800);
     }
 
     @Override
@@ -209,14 +237,15 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     }
 
     private Socket socket;
+
     //发送socket(连接-断开-连接-断开)
-    public void sendSocket(final char msg){
+    public void sendSocket(final char msg) {
         cachedThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     socket = new Socket("192.168.11.123", 2005);
-                    if(socket==null){
+                    if (socket == null) {
                         mHandler.sendEmptyMessage(CONNECT_ERROR);
                         return;
                     }
@@ -234,12 +263,12 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     }
 
     //发送socket2(长连接)
-    public void sendSocket2(final char msg){
+    public void sendSocket2(final char msg) {
         singleThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    if(MyApplication.socket==null){
+                    if (MyApplication.socket == null) {
                         mHandler.sendEmptyMessage(CONNECT_ERROR);
                         return;
                     }
@@ -254,13 +283,14 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
 
     private boolean unlock = true;
     private boolean isRecoding = true;
-    public void click(View view){
-        switch (view.getId()){
+
+    public void click(View view) {
+        switch (view.getId()) {
             case R.id.activity_play_land_btn_unlock:            //横屏锁屏键
                 unlock = !unlock;
-                if(unlock){
+                if (unlock) {
                     unLock_iv.setImageResource(R.drawable.land_btn_unlock);
-                }else{
+                } else {
                     unLock_iv.setImageResource(R.drawable.land_btn_lock);
                     hide();
                 }
@@ -278,12 +308,12 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
             case R.id.activity_play_btn_camera:                //截图键
                 Bitmap bitmap = surfaceView.getBitmap();
                 screenShot(bitmap);
-                soundPool.play(1,1,1,0,0,1);
+                soundPool.play(1, 1, 1, 0, 0, 1);
                 break;
             case R.id.activity_play_btn_vcr:                   //录像键
-                if(isRecoding){
+                if (isRecoding) {
                     startRecordVideo();
-                }else{
+                } else {
                     stopRecordVideo();
                 }
                 isRecoding = !isRecoding;
@@ -313,9 +343,10 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         }
     }
 
-    private static final String SAVE_PIC_PATH= Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED) ? Environment.getExternalStorageDirectory().getAbsolutePath() : "/mnt/sdcard";//保存到SD卡
-    public static final String SAVE_REAL_PATH = SAVE_PIC_PATH+ "/zhongjingVideo";//保存的确切位置
-    private void recordVideo (){
+    private static final String SAVE_PIC_PATH = Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED) ? Environment.getExternalStorageDirectory().getAbsolutePath() : "/mnt/sdcard";//保存到SD卡
+    public static final String SAVE_REAL_PATH = SAVE_PIC_PATH + "/zhongjingVideo";//保存的确切位置
+
+    private void recordVideo() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -323,45 +354,46 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                 if (!filePath.exists()) {
                     filePath.mkdirs();
                 }
-                File VideoPath = new File(filePath, System.currentTimeMillis()+".mp4");
+                File VideoPath = new File(filePath, System.currentTimeMillis() + ".mp4");
                 mediaPlayer.lm_rtspRecordVideo(URL_RTSP, VideoPath.getAbsolutePath());
             }
         }).start();
     }
 
     //开始录制视频
-    private void startRecordVideo(){
+    private void startRecordVideo() {
         timer.setVisibility(View.VISIBLE);
+        timer.startAnimation(mShowAnim);
         timer.setBase(SystemClock.elapsedRealtime());//计时器清零
         int hour = (int) ((SystemClock.elapsedRealtime() - timer.getBase()) / 1000 / 60);
-        timer.setFormat("0"+String.valueOf(hour)+":%s");
+        timer.setFormat("0" + String.valueOf(hour) + ":%s");
         timer.start();
         mediaPlayer.lm_rtspSetRecodeStop(false);
         recordVideo();
     }
 
     //停止录制视频
-    private void stopRecordVideo(){
+    private void stopRecordVideo() {
         mediaPlayer.lm_rtspSetRecodeStop(true);
         timer.stop();
         timer.setVisibility(View.GONE);
+        timer.startAnimation(mHideAnim);
     }
 
     //截图
     private void screenShot(Bitmap bitmap) {
-        String picName = System.currentTimeMillis()+".JPEG";
-        PicUtils.saveBitmap(bitmap,picName);
-        File file = new File(PicUtils.SAVE_REAL_PATH,picName);
-        try {
-            MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), picName, null);
+        String picName = System.currentTimeMillis() + ".JPEG";
+        PicUtils.saveBitmap(bitmap, picName);
+        File file = new File(PicUtils.SAVE_REAL_PATH, picName);
+//        try {
+//            MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), picName, null);
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
             sendBroadcast(intent);
-            Toast.makeText(this,"保存成功",Toast.LENGTH_SHORT).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
-
 
     //手动更改音量和亮度
     @Override
@@ -371,62 +403,110 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
             case MotionEvent.ACTION_DOWN:
                 startY = event.getY();
                 startVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                mBottomY = surfaceView.getBottom();//播放器界面Y坐标作为滑动距离
+
                 break;
             case MotionEvent.ACTION_MOVE:
-                if(!unlock){
+                if (!unlock || startY > mBottomY + 20) {
                     break;
                 }
-                float offsetY = startY - event.getY();
-                float offsetPercent = offsetY / windowH;
-                if(offsetPercent==0.0){
+                float offsetY = startY - event.getY();//位移量
+
+     /*           if (offsetPercent == 0.0) {
                     break;
-                }
+                }*/
+
                 if (event.getX() < windowW / 2) {
-                    int offsetVolume = (int) (offsetPercent * maxVolume);
-                    int finalVolume = startVolume + offsetVolume;
-                    //更新音量
-                    updateVolume(finalVolume);
+                    final double FLING_MIN_DISTANCE = 20;
+                    if (Math.abs(offsetY) > FLING_MIN_DISTANCE) {
+                        float offsetPercent = offsetY / mBottomY;
+                        int offsetVolume = (int) (offsetPercent * maxVolume);//增加或减少的音量
+//                    int finalVolume = startVolume + offsetVolume;//目前的音量
+                        int finalVolume = Math.min(Math.max(startVolume + offsetVolume, 0), maxVolume);
+                        //更新音量
+                        updateVolume(finalVolume);
+                    }
                 } else {
+                    //调节亮度
+                    final double FLING_MIN_DISTANCE = 0.5;
+                    final double FLING_MIN_VELOCITY = 60;
+                    if (offsetY > FLING_MIN_DISTANCE && Math.abs(offsetY) > FLING_MIN_VELOCITY) {
+                        setBrightness(10);
+                    }
+                    if (offsetY < FLING_MIN_DISTANCE && Math.abs(offsetY) > FLING_MIN_VELOCITY) {
+                        setBrightness(-10);
+                    }
+/*
                     int offsetBright = (int) (offsetPercent * 255);
                     int finalBrightness = saveBright + offsetBright;
-                    changeAppBrightness(finalBrightness);
+                    Log.d("测试", "改变亮度=====" + finalBrightness);
+                    changeAppBrightness(finalBrightness);*/
                 }
                 break;
         }
         return super.onTouchEvent(event);
     }
 
+    //更新亮度
+    public void setBrightness(float brightness) {
+        Log.d("测试", "brightness=========" + brightness);
+        mHandler.sendEmptyMessage(HIDE_VOLUME);
+        bright_ll.setVisibility(View.VISIBLE);
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+
+/*        try {
+            saveBright = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        float currentBright = (float) saveBright / 255 ;
+        lp.screenBrightness = currentBright;*/
+
+        if (lp.screenBrightness == -1) {
+            lp.screenBrightness = (float) 0.5;
+        }
+
+        lp.screenBrightness = lp.screenBrightness + brightness / 255.0f;
+
+        if (lp.screenBrightness > 1) {
+            lp.screenBrightness = 1;
+        } else if (lp.screenBrightness < 0) {
+            lp.screenBrightness = 0;
+        }
+        getWindow().setAttributes(lp);
+
+        bright_pb.setProgress((int) (lp.screenBrightness * 255));
+        mHandler.removeMessages(HIDE_BRIGHT);
+        mHandler.sendEmptyMessageDelayed(HIDE_BRIGHT, 1000);
+    }
+
     //更新音量
     private void updateVolume(int volume) {
+        mHandler.sendEmptyMessage(HIDE_BRIGHT);
         volume_ll.setVisibility(View.VISIBLE);
-        float currentVolume = (float)volume/maxVolume*100;
-        volume_pb.setProgress((int)currentVolume);
+//        volume_ll.startAnimation(mShowAnim);
+        float currentVolume = (float) volume / maxVolume * 100;
+        volume_pb.setProgress((int) currentVolume);
+
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
         mHandler.removeMessages(HIDE_VOLUME);
-        mHandler.sendEmptyMessageDelayed(HIDE_VOLUME, 3*1000);
+        mHandler.sendEmptyMessageDelayed(HIDE_VOLUME, 1000);
     }
 
     //改变系统亮度
     private int saveBright;
-    public void changeAppBrightness(int brightness) {
-        saveBright = brightness;
-        bright_ll.setVisibility(View.VISIBLE);
-        bright_pb.setProgress(brightness);
-        if (brightness == -1) {
-            lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
-        } else {
-            lp.screenBrightness = (brightness <= 0 ? 1 : brightness)/255f;
-        }
-        window.setAttributes(lp);
-        mHandler.removeMessages(HIDE_BRIGHT);
-        mHandler.sendEmptyMessageDelayed(HIDE_BRIGHT, 3*1000);
-    }
+
 
     @Override
     public void onSurfaceCreated(@NonNull IRenderView.ISurfaceHolder holder, int width, int height) {
         holder.bindToMediaPlayer(mediaPlayer);
         //开启异步准备
-        mediaPlayer.prepareAsync();
+        try {
+            mediaPlayer.prepareAsync();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -439,10 +519,10 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
 
     }
 
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener{
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {    //单击
-            if(unlock){
+            if (unlock) {
                 showOrHide();
             }
             return super.onSingleTapConfirmed(e);
@@ -462,12 +542,14 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
 
     //显示或隐藏菜单栏
     private void showOrHide() {
-        if(isHide){
+        if (isHide) {
             show();                                //显示菜单栏
             unLock_iv.setVisibility(View.VISIBLE); //显示锁屏键
-        }else{
+            unLock_iv.startAnimation(mShowAnim);
+        } else {
             hide();                                 //隐藏菜单栏
             unLock_iv.setVisibility(View.INVISIBLE);//隐藏锁屏键
+            unLock_iv.startAnimation(mHideAnim);
         }
     }
 
@@ -476,6 +558,10 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         topLayout.setVisibility(View.VISIBLE);
         bottomLayout.setVisibility(View.VISIBLE);
         rightLayout.setVisibility(View.VISIBLE);
+
+        topLayout.startAnimation(mShowAnim);
+        bottomLayout.startAnimation(mShowAnim);
+        rightLayout.startAnimation(mShowAnim);
         isHide = false;
     }
 
@@ -484,7 +570,12 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         topLayout.setVisibility(View.INVISIBLE);
         bottomLayout.setVisibility(View.INVISIBLE);
         rightLayout.setVisibility(View.INVISIBLE);
+
+        topLayout.startAnimation(mHideAnim);
+        bottomLayout.startAnimation(mHideAnim);
+        rightLayout.startAnimation(mHideAnim);
         isHide = true;
     }
+
 
 }

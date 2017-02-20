@@ -2,8 +2,8 @@ package zhongjing.dcyy.com.utils;
 
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.util.Log;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,25 +13,37 @@ import java.io.IOException;
  */
 
 public class PicUtils {
-    /** 首先默认个文件保存路径 */
-    private static final String SAVE_PIC_PATH= Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED) ? Environment.getExternalStorageDirectory().getAbsolutePath() : "/mnt/sdcard";//保存到SD卡
-    public static final String SAVE_REAL_PATH = SAVE_PIC_PATH+ "/zhongjing";//保存的确切位置
-
+    /**
+     * 首先默认文件保存路径
+     */
+    public static final String SAVE_PIC_PATH = Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED) ? Environment.getExternalStorageDirectory().getAbsolutePath() : "/mnt/sdcard";//保存到SD卡
+    public static final String SAVE_REAL_PATH = SAVE_PIC_PATH + "/zhongjing";//保存的确切位置
+//    public static final String SAVE_REAL_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/zhongjing/";
     public static void saveBitmap(Bitmap bm, String fileName) {
+//        File filePath = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/zhongjing/");
         File filePath = new File(SAVE_REAL_PATH);
         if (!filePath.exists()) {
             filePath.mkdirs();
         }
         File picPath = new File(filePath, fileName);
         try {
-            filePath.createNewFile();
-            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(picPath));
-            bm.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-            bos.flush();
-            bos.close();
+            if(!picPath.exists()){
+                picPath.createNewFile();
+            }
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("测试", "展示错误" + e.toString());
         }
 
+        try {
+
+//            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(picPath));
+            FileOutputStream foStream = new FileOutputStream(picPath);
+            bm.compress(Bitmap.CompressFormat.PNG, 100, foStream);
+            foStream.flush();
+            foStream.close();
+        } catch (IOException e) {
+            Log.d("测试", "展示错误" + e.toString());
+        }
     }
 }

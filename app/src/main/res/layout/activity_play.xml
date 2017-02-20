@@ -2,13 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:weightSum="2"
-              android:orientation="vertical" >
+              android:orientation="vertical">
 
     <RelativeLayout
         android:layout_weight="0.8"
         android:layout_width="match_parent"
         android:layout_height="0dp">
+
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            app:indicatorName="LineScalePartyIndicator"
+            app:indicatorColor="#ffffff"
+        />
 
         <RelativeLayout
             android:id="@+id/activity_play_land_rl_top"
@@ -74,18 +85,18 @@
             <Button
                 android:onClick="click"
                 android:id="@+id/activity_play_btn_back"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/vertical_btn_back"
+                android:background="@drawable/vertical_btn_back_v"
                 android:layout_width="35dp"
                 android:layout_height="35dp"/>
 
             <Button
                 android:onClick="click"
                 android:id="@+id/activity_play_btn_fullscreen"
-                android:background="@drawable/vertical_btn_fullscreen"
+                android:background="@drawable/vertical_btn_fullscreenv_v"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="8dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_width="35dp"
                 android:layout_height="35dp"/>
@@ -100,25 +111,14 @@
         android:layout_height="0dp">
 
         <ImageView
-            android:src="@drawable/vertical_btn_camera"
-            android:onClick="click"
-            android:padding="12dp"
-            android:id="@+id/activity_play_btn_camera"
-            android:background="@drawable/btn_black"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="15dp"
-            android:layout_width="@dimen/vertical_width_function"
-            android:layout_height="@dimen/vertical_height_function"/>
-
-        <ImageView
             android:src="@drawable/vertical_btn_vcr"
             android:onClick="click"
             android:padding="12dp"
             android:id="@+id/activity_play_btn_vcr"
             android:background="@drawable/btn_black"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="25dp"
             android:layout_width="@dimen/vertical_width_function"
             android:layout_height="@dimen/vertical_height_function"/>
 
@@ -129,8 +129,8 @@
             android:id="@+id/activity_play_btn_menu"
             android:background="@drawable/btn_black"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="15dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginBottom="25dp"
             android:layout_width="@dimen/vertical_width_function"
             android:layout_height="@dimen/vertical_height_function"/>
 
@@ -142,8 +142,8 @@
             android:background="@drawable/btn_black"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginBottom="25dp"
             android:layout_width="@dimen/vertical_width_function"
             android:layout_height="@dimen/vertical_height_function"/>
 
@@ -160,19 +160,12 @@
                 android:layout_height="80dp"/>
 
             <ImageView
-                android:src="@drawable/vertical_btn_ok_selector"
-                android:onClick="click"
-                android:id="@+id/activity_play_btn_ok"
-                android:layout_centerInParent="true"
-                android:layout_width="20dp"
-                android:layout_height="15dp"/>
-
-            <ImageView
                 android:src="@drawable/vertical_btn_left_selector"
                 android:onClick="click"
                 android:id="@+id/activity_play_btn_left"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="30dp"
+                android:layout_marginLeft="10dp"
+                android:padding="20dp"
                 android:layout_width="@dimen/vertical_width_menu"
                 android:layout_height="@dimen/vertical_height_menu"/>
 
@@ -182,7 +175,8 @@
                 android:id="@+id/activity_play_btn_down"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="10dp"
+                android:padding="20dp"
                 android:layout_width="@dimen/vertical_width_menu"
                 android:layout_height="@dimen/vertical_height_menu"/>
 
@@ -192,7 +186,8 @@
                 android:id="@+id/activity_play_btn_right"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="30dp"
+                android:layout_marginRight="10dp"
+                android:padding="20dp"
                 android:layout_width="@dimen/vertical_width_menu"
                 android:layout_height="@dimen/vertical_height_menu"/>
 
@@ -202,11 +197,36 @@
                 android:id="@+id/activity_play_btn_up"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="10dp"
+                android:padding="20dp"
+                android:cropToPadding="true"
                 android:layout_width="@dimen/vertical_width_menu"
                 android:layout_height="@dimen/vertical_height_menu"/>
 
+            <ImageView
+                android:src="@drawable/vertical_btn_ok_selector"
+                android:onClick="click"
+                android:id="@+id/activity_play_btn_ok"
+                android:padding="15dp"
+                android:layout_width="60dp"
+                android:layout_height="55dp"
+                android:layout_centerVertical="true"
+                android:layout_alignLeft="@+id/activity_play_btn_up"
+                android:layout_alignStart="@+id/activity_play_btn_up"/>
+
         </RelativeLayout>
+
+        <ImageView
+            android:src="@drawable/vertical_btn_camera"
+            android:onClick="click"
+            android:padding="12dp"
+            android:id="@+id/activity_play_btn_camera"
+            android:background="@drawable/btn_black"
+            android:layout_width="@dimen/vertical_width_function"
+            android:layout_height="@dimen/vertical_height_function"
+            android:layout_alignTop="@+id/activity_play_btn_vcr"
+            android:layout_alignLeft="@+id/activity_play_btn_menu"
+            android:layout_alignStart="@+id/activity_play_btn_menu"/>
 
     </RelativeLayout>
 
