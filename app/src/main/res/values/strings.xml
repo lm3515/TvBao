@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ZJBOX</string>
+    <string name="app_name">电视宝</string>
 
     <!--SettingsActivity-->
     <string name="wifi_name">名称不能为空</string>

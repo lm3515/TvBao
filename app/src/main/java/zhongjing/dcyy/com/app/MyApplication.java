@@ -34,7 +34,7 @@ public class MyApplication extends Application {
         OkHttpUtils.initClient(okHttpClient);
 
         //Bugly
-        Bugly.init(getApplicationContext(), "523a62318c", false);
+        Bugly.init(getApplicationContext(), "a59ecd1208", false);
 
 /*        new Thread(new Runnable() {
             @Override

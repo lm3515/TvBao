@@ -25,7 +25,8 @@
         android:layout_marginBottom="91dp">
 
         <ImageView
-            android:src="@drawable/splash_logo"
+            android:scaleType="center"
+            android:src="@drawable/splash_logo_2"
             android:layout_width="300dp"
             android:layout_height="200dp"
             android:layout_marginTop="120dp"/>
