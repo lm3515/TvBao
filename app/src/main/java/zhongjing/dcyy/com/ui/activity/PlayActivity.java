@@ -38,7 +38,6 @@ import java.net.Socket;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import zhongjing.dcyy.com.R;
-import zhongjing.dcyy.com.app.MyApplication;
 import zhongjing.dcyy.com.utils.PicUtils;
 import zhongjing.dcyy.com.widget.widget.media.IRenderView;
 import zhongjing.dcyy.com.widget.widget.media.TextureRenderView;
@@ -101,6 +100,7 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     private Animation mShowAnim;
     private Animation mHideAnim;
     private View mLoading;
+    private Socket mSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,9 +115,64 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         initListener();
         initEvent();
         initAnimation();
-        /*IjkMediaPlayer.loadLibrariesOnce(null);
-        IjkMediaPlayer.native_profileBegin("libijkplayer.so");*/
 
+        initSocket();
+        initReConnectedTask();
+        Log.d("测试", "onCreate");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("测试", "onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("测试", "onResume");
+    }
+
+    private void initReConnectedTask() {
+        cachedThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    SystemClock.sleep(15 * 1000);
+                    try {
+                        mSocket.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d("测试", "重新连接关闭socket时出问题了" + "====SOCKET=========" + e.toString());
+                    }
+                    initSocket();//在此与socket服务器建立连接
+                    Log.d("测试", "重新连接" + "====SOCKET====" + mSocket.hashCode());
+                }
+            }
+        });
+    }
+
+
+    private void initSocket() {
+        cachedThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+//                BufferedReader reader = null;
+                try {
+                    mSocket = new Socket("192.168.11.123", 2005);
+//                    reader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+
+//                    String str = null;
+//                    if ((str = reader.readLine()) != null) {
+//                        Log.d("测试","连接Server返回消息" + str);
+//                    }
+                    Log.d("测试", "创建新的" + "====SOCKET====" + mSocket.hashCode());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d("测试", "创建SOCKET出错===" + e.toString());
+                }
+            }
+        });
     }
 
 
@@ -129,12 +184,27 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("测试", "onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("测试", "onStop");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mediaPlayer.stop();
+        try {
+            mSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            Log.d("测试", "socket为空");
+        }
+        cachedThreadPool.shutdown();
     }
 
     private void initView() {
@@ -236,7 +306,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
 
     }
 
-    private Socket socket;
 
     //发送socket(连接-断开-连接-断开)
     public void sendSocket(final char msg) {
@@ -244,17 +313,17 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
             @Override
             public void run() {
                 try {
-                    socket = new Socket("192.168.11.123", 2005);
-                    if (socket == null) {
+                    mSocket = new Socket("192.168.11.123", 2005);
+                    if (mSocket == null) {
                         mHandler.sendEmptyMessage(CONNECT_ERROR);
                         return;
                     }
-                    DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
+                    DataOutputStream writer = new DataOutputStream(mSocket.getOutputStream());
                     writer.write(Character.toString(msg).getBytes());
                     writer.flush();
-                    socket.shutdownOutput();
-                    socket.close();
-                    socket = null;
+                    mSocket.shutdownOutput();
+                    mSocket.close();
+                    mSocket = null;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -264,18 +333,24 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
 
     //发送socket2(长连接)
     public void sendSocket2(final char msg) {
-        singleThreadPool.execute(new Runnable() {
+        cachedThreadPool.execute(new Runnable() {
             @Override
             public void run() {
+                DataOutputStream writer = null;
                 try {
-                    if (MyApplication.socket == null) {
+                    Log.d("测试", "点击发送信息" + msg + "====SOCKET====" + mSocket.hashCode());
+                    if (mSocket == null) {
                         mHandler.sendEmptyMessage(CONNECT_ERROR);
                         return;
                     }
-                    DataOutputStream writer = new DataOutputStream(MyApplication.socket.getOutputStream());
+                    writer = new DataOutputStream(mSocket.getOutputStream());
                     writer.write(Character.toString(msg).getBytes());
+                    writer.flush();
                 } catch (IOException e) {
+                    Log.d("测试", "点击发送信息出错" + e.toString() + "====SOCKET====" + mSocket.hashCode());
                     e.printStackTrace();
+                } catch (NullPointerException e) {
+                    Log.d("测试", "点击发送信息出错" + e.toString());
                 }
             }
         });
@@ -297,6 +372,9 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                 break;
             case R.id.activity_play_btn_back:                  //竖屏返回键
                 finish();
+                if (!isRecoding) {
+                    stopRecordVideo();
+                }
                 break;
             case R.id.activity_play_btn_fullscreen:            //竖屏全屏键
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -385,14 +463,10 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         String picName = System.currentTimeMillis() + ".JPEG";
         PicUtils.saveBitmap(bitmap, picName);
         File file = new File(PicUtils.SAVE_REAL_PATH, picName);
-//        try {
-//            MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), picName, null);
-            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
-            sendBroadcast(intent);
-            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file));
+        sendBroadcast(intent);
+        Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+
     }
 
     //手动更改音量和亮度
@@ -412,16 +486,11 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                 }
                 float offsetY = startY - event.getY();//位移量
 
-     /*           if (offsetPercent == 0.0) {
-                    break;
-                }*/
-
-                if (event.getX() < windowW / 2) {
+                if (event.getX() > windowW / 2) {
                     final double FLING_MIN_DISTANCE = 20;
                     if (Math.abs(offsetY) > FLING_MIN_DISTANCE) {
                         float offsetPercent = offsetY / mBottomY;
                         int offsetVolume = (int) (offsetPercent * maxVolume);//增加或减少的音量
-//                    int finalVolume = startVolume + offsetVolume;//目前的音量
                         int finalVolume = Math.min(Math.max(startVolume + offsetVolume, 0), maxVolume);
                         //更新音量
                         updateVolume(finalVolume);
@@ -436,11 +505,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
                     if (offsetY < FLING_MIN_DISTANCE && Math.abs(offsetY) > FLING_MIN_VELOCITY) {
                         setBrightness(-10);
                     }
-/*
-                    int offsetBright = (int) (offsetPercent * 255);
-                    int finalBrightness = saveBright + offsetBright;
-                    Log.d("测试", "改变亮度=====" + finalBrightness);
-                    changeAppBrightness(finalBrightness);*/
                 }
                 break;
         }
@@ -453,15 +517,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         mHandler.sendEmptyMessage(HIDE_VOLUME);
         bright_ll.setVisibility(View.VISIBLE);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-
-/*        try {
-            saveBright = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        float currentBright = (float) saveBright / 255 ;
-        lp.screenBrightness = currentBright;*/
 
         if (lp.screenBrightness == -1) {
             lp.screenBrightness = (float) 0.5;

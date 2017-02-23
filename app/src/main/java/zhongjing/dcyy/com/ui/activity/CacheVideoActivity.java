@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -250,18 +251,22 @@ public class CacheVideoActivity extends AppCompatActivity implements IRenderView
                 }
                 if(Math.abs(offsetX)<Math.abs((offsetY))){ //上下滑动
 
-                    if (event.getX() < windowW / 2) {
+                    if (event.getX() > windowW / 2) {
                         int offsetVolume = (int) (offsetPercent * maxVolume);
                         int finalVolume = startVolume + offsetVolume;
                         //更新音量
                         updateVolume(finalVolume);
                     } else{
-                        int offsetBright = (int) (offsetPercent * 255);
-                        int finalBrightness = saveBright + offsetBright;
-                        //更新亮度
-                        changeAppBrightness(finalBrightness);
+                        //调节亮度
+                        final double FLING_MIN_DISTANCE = 0.5;
+                        final double FLING_MIN_VELOCITY = 60;
+                        if (offsetY > FLING_MIN_DISTANCE && Math.abs(offsetY) > FLING_MIN_VELOCITY) {
+                            setBrightness(10);
+                        }
+                        if (offsetY < FLING_MIN_DISTANCE && Math.abs(offsetY) > FLING_MIN_VELOCITY) {
+                            setBrightness(-10);
+                        }
                     }
-
                 }else{ //左右滑动
                     if(endX-startX>0){ //快进
                         long pos = mediaPlayer.getCurrentPosition();
@@ -275,11 +280,34 @@ public class CacheVideoActivity extends AppCompatActivity implements IRenderView
                         mediaPlayer.seekTo(pos);
                     }
                     break;
-
                 }
-
         }
         return super.onTouchEvent(event);
+    }
+
+    //更新亮度
+    public void setBrightness(float brightness) {
+        Log.d("测试", "brightness=========" + brightness);
+        mHandler.sendEmptyMessage(HIDE_VOLUME);
+        bright_ll.setVisibility(View.VISIBLE);
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+
+        if (lp.screenBrightness == -1) {
+            lp.screenBrightness = (float) 0.5;
+        }
+
+        lp.screenBrightness = lp.screenBrightness + brightness / 255.0f;
+
+        if (lp.screenBrightness > 1) {
+            lp.screenBrightness = 1;
+        } else if (lp.screenBrightness < 0) {
+            lp.screenBrightness = 0;
+        }
+        getWindow().setAttributes(lp);
+
+        bright_pb.setProgress((int) (lp.screenBrightness * 255));
+        mHandler.removeMessages(HIDE_BRIGHT);
+        mHandler.sendEmptyMessageDelayed(HIDE_BRIGHT, 1000);
     }
 
     @Override
@@ -322,6 +350,7 @@ public class CacheVideoActivity extends AppCompatActivity implements IRenderView
 
     //根据当前播放状态设置播放状态图标
     private void updatePlayStateBtn() {
+        mHandler.sendEmptyMessage(HIDE_BRIGHT);
         boolean playing = mediaPlayer.isPlaying();
         if (playing) {
             playState.setImageResource(R.drawable.cache_video_play);

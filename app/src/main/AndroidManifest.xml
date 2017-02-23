@@ -38,7 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.PlayActivity" android:launchMode="singleTop"/>
+        <activity
+            android:name=".ui.activity.PlayActivity"
+            android:launchMode="singleTop"/>
         <activity android:name=".ui.activity.SettingsActivity"/>
         <activity
             android:name="com.tencent.bugly.beta.ui.BetaActivity"
