@@ -101,6 +101,7 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     private Animation mHideAnim;
     private View mLoading;
     private Socket mSocket;
+    private boolean playerIsPrepared;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,21 +117,8 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         initEvent();
         initAnimation();
 
-        initSocket();
-        initReConnectedTask();
-        Log.d("测试", "onCreate");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d("测试", "onStart");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("测试", "onResume");
+        initSocket();//初始化socket
+        initReConnectedTask();//初始化重连SOCKET任务
     }
 
     private void initReConnectedTask() {
@@ -151,7 +139,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
             }
         });
     }
-
 
     private void initSocket() {
         cachedThreadPool.submit(new Runnable() {
@@ -179,18 +166,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     private void initAnimation() {
         mShowAnim = AnimationUtils.loadAnimation(this, R.anim.show_anim);
         mHideAnim = AnimationUtils.loadAnimation(this, R.anim.hide_anim);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("测试", "onPause");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("测试", "onStop");
     }
 
     @Override
@@ -253,7 +228,6 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
 
     private void initEvent() {
         mediaPlayer = new IjkMediaPlayer();
-
         surfaceView.addRenderCallback(this);
 
         mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "probesize", 1024 * 16);
@@ -271,9 +245,9 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
             e.printStackTrace();
         }
 
-        //mediaPlayer准备工作
+        //mediaPlayer准备工作-------回调,onPrepared
         mediaPlayer.setOnPreparedListener(this);
-        //MediaPlayer完成
+        //MediaPlayer完成---------回调,onCompletion
         mediaPlayer.setOnCompletionListener(this);
 
         //截图时声音
@@ -293,6 +267,8 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     @Override
     public void onPrepared(IMediaPlayer iMediaPlayer) {
         iMediaPlayer.start();
+        playerIsPrepared = true;
+        Log.d("测试", "onPrepared===准备完毕");
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -302,8 +278,22 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
     }
 
     @Override
-    public void onCompletion(IMediaPlayer iMediaPlayer) {
+    protected void onResume() {
+        super.onResume();
+        if (playerIsPrepared) {
+            mediaPlayer.start();
+        }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mediaPlayer.pause();
+    }
+
+    @Override
+    public void onCompletion(IMediaPlayer iMediaPlayer) {
+        Log.d("测试", "onCompletion");
     }
 
 
@@ -558,6 +548,7 @@ public class PlayActivity extends BaseActivity implements IMediaPlayer.OnPrepare
         holder.bindToMediaPlayer(mediaPlayer);
         //开启异步准备
         try {
+            Log.d("测试", "onSurfaceCreated");
             mediaPlayer.prepareAsync();
         } catch (IllegalStateException e) {
             e.printStackTrace();

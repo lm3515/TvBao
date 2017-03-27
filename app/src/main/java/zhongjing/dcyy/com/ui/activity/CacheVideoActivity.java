@@ -88,7 +88,7 @@ public class CacheVideoActivity extends AppCompatActivity implements IRenderView
     private TextView totalTime;
     private ImageView playState;
     private File videoPath;
-
+    private boolean playerIsPrepared;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -199,6 +199,20 @@ public class CacheVideoActivity extends AppCompatActivity implements IRenderView
                 }
                 updatePlayState();
                 break;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (playerIsPrepared){
+
         }
     }
 
@@ -336,6 +350,7 @@ public class CacheVideoActivity extends AppCompatActivity implements IRenderView
         totalTime.setText(TimeUtils.parseDuration((int)duration));//设置总时长
         //开始更新进度
         startUpdateProgress();
+        playerIsPrepared = true;//表示播放器已经准备好了
     }
 
     @Override

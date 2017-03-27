@@ -52,4 +52,12 @@
     <string name="confirm_reset">您确定要恢复出厂设置?</string>
 
 
+    <!--CheckNetActivity-->
+    <string name="quit">再按一次退出程序</string>
+    <string name="quit_setting">再按一次退出设置</string>
+    <string name="none">无</string>
+    <string name="wifi_notconnected">wifi未连接</string>
+    <string name="wifi_not_open">wifi未打开</string>
+    <string name="checkwifi">请手动检查WIFI</string>
+
 </resources>

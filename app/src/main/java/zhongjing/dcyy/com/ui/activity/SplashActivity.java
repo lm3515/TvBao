@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 
 import zhongjing.dcyy.com.R;
+import zhongjing.dcyy.com.utils.BackPressedUtil;
+import zhongjing.dcyy.com.utils.SPUtils;
 
 public class SplashActivity extends AppCompatActivity {
     private Handler mHandler = new Handler();
@@ -16,22 +18,36 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        if (savedInstanceState == null) {
-            init();
-            Log.d("测试", "第一次进入");
+        initFirst(savedInstanceState);
+    }
+
+    private void initFirst(Bundle savedInstanceState) {
+        if (SPUtils.getFirstGoIN(this)) {//如果首次进入
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("测试", "跳转");
+                    startActivity(new Intent(SplashActivity.this, CheckNetActivity.class));
+                    overridePendingTransition(R.anim.slide_up_in,
+                            R.anim.slide_down_out);
+                }
+            }, 500);
+        } else {//如果不是首次进入
+            if (savedInstanceState == null) {//首次打开App
+                init();
+                Log.d("测试", "第一次进入");
+            }
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("测试", "start");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("测试", "RESUME");
     }
 
     private void init() {
@@ -69,18 +85,22 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("测试", "pause");
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d("测试", "存起来");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("测试", "onStop");
     }
+
+
+    @Override
+    public void onBackPressed() {
+        BackPressedUtil.getInstance().showQuitTips(this, R.string.quit);
+    }
+
 }

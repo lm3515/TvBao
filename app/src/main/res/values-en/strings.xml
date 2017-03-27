@@ -50,6 +50,13 @@
 
     <!--reset_dialog-->
     <string name="confirm_reset">Are you sure you want to restore the factory Settings?</string>
+    <string name="quit">Press again to exit the program</string>
+    <string name="quit_setting">Press again to exit the setting</string>
+    <string name="none">none</string>
+    <string name="wifi_notconnected">Wifi not connected</string>
+    <string name="wifi_not_open">Wifi not open</string>
+    <string name="checkwifi">Please check WIFI manually</string>
+
 
 
 </resources>
